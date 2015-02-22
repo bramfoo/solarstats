@@ -9,7 +9,7 @@ class SolarUtils:
 
     # Print a string as uppercase hex characters, without leading '0x'
     # FIXME
-    def printHex(self, hexVar):
+    def printhex(self, hexVar):
         if type(hexVar) is int:
             return str(hex(hexVar)[2:]).upper()
         if type(hexVar) is unicode:
@@ -26,20 +26,20 @@ class SolarUtils:
             result += binascii.unhexlify(word)
         return result
 
-    # Perform a bitwise right shift. Judiciuously taken from Minimalmodbus [http://minimalmodbus.sourceforge.net/]        
+    # Perform a bitwise right shift. Judiciuously taken from Minimalmodbus [http://minimalmodbus.sourceforge.net/]
     def rightshift(self, inputInteger):
         shifted = inputInteger >> 1
         carrybit = inputInteger & 1
-        return shifted, carrybit 
+        return shifted, carrybit
 
     # Convert a hexadecimal value to integer
-    def hexToInt(self, inp):
+    def hex2int(self, inp):
         i = 0
         result = 0
         for char in inp:  # Is little-endian, so no need to reverse
             result += int(char.encode('hex'), 16) * math.pow(256, i)
             i += 1
-        #logging.debug("Converted hex value %s to int value %d", printHex(input), result)
+        #logging.debug("Converted hex value %s to int value %d", printhex(input), result)
         return result
         #return int(inp, 16)
         # For \xFF encoded strings: ord('\xFF')
