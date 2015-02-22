@@ -1,5 +1,5 @@
 -- Run the following to initialise the database:
--- sqlite3 SolarElz673.sqlt < SolarElz673.sql
+-- sqlite3 SolarStats.sqlt < SolarStatsInit.sql
 
 CREATE TABLE IF NOT EXISTS inverter (
   ID INTEGER(8) PRIMARY KEY NOT NULL,

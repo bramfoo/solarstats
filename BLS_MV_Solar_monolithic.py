@@ -22,11 +22,11 @@ read_mastervolt="\x11\x00\x00\x00\xB6\x00\x00\x00\xC7"
 
 
 # Program data
-logFile        = "SolarElz673.log"
-sqliteInitFile = 'SolarElz673.sql'
-sqliteDbName   = 'SolarElz673.sqlt'
-rrdDbBLS      = 'SolarElz673_BLS.rrd'
-rrdDbSol      = 'SolarElz673_Sol.rrd'
+logFile        = "SolarStats.log"
+sqliteInitFile = 'SolarStatsInit.sql'
+sqliteDbName   = 'SolarStats.sqlt'
+rrdDbBLS      = 'SolarStats_BLS.rrd'
+rrdDbSol      = 'SolarStats_Sol.rrd'
 workingDir     = '/home/pi/'
 rrdArchDir     = 'rrdGraphs/'
 webDir         = '/var/www/'
@@ -266,7 +266,7 @@ def mv_parseResponse(response, cmd):
 def rrd_graph(imgName, startTime, endTime, imgTitle):
     
     # Create a RRDtool graph, using the Linux command
-    # `rrdtool graph <imgName> --start <start> --end <end> --imgformat PNG --width 500 --height 250 --title <title> --lower-limit 0 --rigid --units-exponent 0 --vertical-label Watt DEF:bls5avg=SolarElz673.rrd:bls3000:AVERAGE LINE1:bls5avg#0000FF:"Solar Power output" DEF:bls5max=SolarElz673.rrd:bls3000:MAX:start=end-1y LINE1:bls5max#00FF00:"Solar Power max" DEF:bls5min=SolarElz673.rrd:bls3000:MIN:start=end-1y LINE1:bls5min#FF0000:"Solar Power min" COMMENT:"Generated on <time>"
+    # `rrdtool graph <imgName> --start <start> --end <end> --imgformat PNG --width 500 --height 250 --title <title> --lower-limit 0 --rigid --units-exponent 0 --vertical-label Watt DEF:bls5avg=SolarStats.rrd:bls3000:AVERAGE LINE1:bls5avg#0000FF:"Solar Power output" DEF:bls5max=SolarStats.rrd:bls3000:MAX:start=end-1y LINE1:bls5max#00FF00:"Solar Power max" DEF:bls5min=SolarStats.rrd:bls3000:MIN:start=end-1y LINE1:bls5min#FF0000:"Solar Power min" COMMENT:"Generated on <time>"
     # Averages plotted are year-long averages
     
     try:
@@ -306,10 +306,10 @@ def createHTML(iv1, iv2):
     htmlDest = os.path.join(webDir, 'index.html')
     logging.debug("Creating HTML code in '%s'", tempFile)
     with open(tempFile, 'w') as htmlFile:
-        htmlFile.write('<HTML><HEAD><TITLE>Elzendreef 673 PV measurements</TITLE></HEAD>\n')
+        htmlFile.write('<HTML><HEAD><TITLE>Home PV measurements</TITLE></HEAD>\n')
         htmlFile.write('<BODY BGCOLOR="000066" TEXT="#E8EEFD" LINK="#FFFFFF" VLINK="#C6FDF4" ALINK="#0BBFFF" BACKGROUND="$BGIMG">\n')
         htmlFile.write('<TABLE BORDER=1 CELLPADDING=1 CELLSPACING=2 BGCOLOR="#1A689D" BORDERCOLOR="#0DD3EA" ALIGN="center">\n')
-        htmlFile.write('<TR><TD colspan="6"><CENTER><font size=5>Elzendreef 673 PV</font><BR><font size=-1> Last update: ' + str(time.asctime()) + '</font></CENTER></TD><TR>\n')
+        htmlFile.write('<TR><TD colspan="6"><CENTER><font size=5>Home PV</font><BR><font size=-1> Last update: ' + str(time.asctime()) + '</font></CENTER></TD><TR>\n')
         htmlFile.write('<TR><TD colspan="6"><CENTER>.</CENTER></TD></TR>\n')
         
         yearly = [bls2013, sol2013]
@@ -346,10 +346,10 @@ def createHTML(iv1, iv2):
         htmlFile.write('</TABLE><BR><CENTER><font size=-1>Uptime: ' + uptime + '</font>\n')
         htmlFile.write('<BR><BR>\n')
         htmlFile.write('<FORM><INPUT TYPE="button" VALUE="Refresh" onClick="window.location.reload()" ></FORM><BR>')
-        htmlFile.write('<IMG src="solarElz673_last24hrs.png" alt="Last 24 hours"><BR><BR>\n')
-        htmlFile.write('<IMG src="solarElz673_last7days.png" alt="Last 7 days"><BR><BR>\n')
-        htmlFile.write('<IMG src="solarElz673_last30days.png" alt="Last 30 days"><BR><BR>\n')
-        htmlFile.write('<IMG src="solarElz673_lastyear.png" alt="Last 365 days"><BR><BR>\n')
+        htmlFile.write('<IMG src="solarStats_last24hrs.png" alt="Last 24 hours"><BR><BR>\n')
+        htmlFile.write('<IMG src="solarStats_last7days.png" alt="Last 7 days"><BR><BR>\n')
+        htmlFile.write('<IMG src="solarStats_last30days.png" alt="Last 30 days"><BR><BR>\n')
+        htmlFile.write('<IMG src="solarStats_lastyear.png" alt="Last 365 days"><BR><BR>\n')
         htmlFile.write('<BR><font size=-1>The Dilapidation Crew - 2013</font></center></body></html>\n')
 
     try: 
@@ -383,7 +383,7 @@ def latestDbVals(inverter, columnName, useDate):
 # Initialise. Runs the SQLite, RRDtool database generation. Needs to only run once, or when a reset is required.
 def createDbs():
     # Create a SQLite database, using the Linux command 
-    # `sqlite3 SolarElz673.sqlt < SolarElz673.sql`
+    # `sqlite3 SolarStats.sqlt < SolarStatsInit.sql`
     if os.path.isfile(sqliteInitFile):
         try:
             with open(sqliteInitFile, 'r') as initFile:
@@ -397,7 +397,7 @@ def createDbs():
         sys.exit(1)
 
     # Create a RRDtool database, using the Linux command
-    # `rrdtool create SolarElz673_BLS.rrd --step 300 DS:bls3000:GAUGE:600:U:U RRA:LAST:0.5:1:288 RRA:LAST:0.5:6:336 RRA:MIN:0.5:6:336 RRA:AVERAGE:0.5:6:336 RRA:MAX:0.5:6:336 RRA:LAST:0.5:12:720 RRA:MIN:0.5:12:720 RRA:AVERAGE:0.5:12:720 RRA:MAX:0.5:12:720 RRA:LAST:0.5:288:365 RRA:MIN:0.5:288:365 RRA:AVERAGE:0.5:288:365 RRA:MAX:0.5:288:365`
+    # `rrdtool create SolarStats_BLS.rrd --step 300 DS:bls3000:GAUGE:600:U:U RRA:LAST:0.5:1:288 RRA:LAST:0.5:6:336 RRA:MIN:0.5:6:336 RRA:AVERAGE:0.5:6:336 RRA:MAX:0.5:6:336 RRA:LAST:0.5:12:720 RRA:MIN:0.5:12:720 RRA:AVERAGE:0.5:12:720 RRA:MAX:0.5:12:720 RRA:LAST:0.5:288:365 RRA:MIN:0.5:288:365 RRA:AVERAGE:0.5:288:365 RRA:MAX:0.5:288:365`
     # This provides 24hrs, 7day, 30day, 1year data sets
 
     try:
@@ -532,7 +532,7 @@ def createDbs():
 
     # Add cronjob:
     # >crontab -e
-    # >*/5 * * * * /home/pi/BLS_SolarElz673.py >> /home/pi/SolarConsole.log 2>&1
+    # >*/5 * * * * /home/pi/BLS_SolarStats.py >> /home/pi/SolarConsole.log 2>&1
     # >crontab -l (list jobs)
 
 
@@ -639,10 +639,10 @@ if __name__=="__main__":
         logging.debug("Creating RRD graphs (crontime is %s:%s)...", hour, minute)
         epochNow=int(time.time()) # Seconds since epoch
         logging.info("Creating RRD graphs, using end time %i", epochNow)
-        rrd_graph('solarElz673_last24hrs.png', epochNow - 60*60*24, epochNow, 'Last 24 hours')
-        rrd_graph('solarElz673_last7days.png', epochNow - 60*60*24*7, epochNow, 'Last 7 days')
-        rrd_graph('solarElz673_last30days.png', epochNow - 60*60*24*30, epochNow, 'Last 30 days')
-        rrd_graph('solarElz673_lastyear.png', epochNow - 60*60*24*365, epochNow, 'Last year')
+        rrd_graph('solarStats_last24hrs.png', epochNow - 60*60*24, epochNow, 'Last 24 hours')
+        rrd_graph('solarStats_last7days.png', epochNow - 60*60*24*7, epochNow, 'Last 7 days')
+        rrd_graph('solarStats_last30days.png', epochNow - 60*60*24*30, epochNow, 'Last 30 days')
+        rrd_graph('solarStats_lastyear.png', epochNow - 60*60*24*365, epochNow, 'Last year')
         if args.graph:
             sys.exit()
 
@@ -945,7 +945,7 @@ if __name__=="__main__":
         filenames = os.listdir(webDir)
         logging.debug("Found files: '%s'", filenames)
         try:
-            for imgName in fnmatch.filter(filenames, 'solarElz673*.png'):
+            for imgName in fnmatch.filter(filenames, 'solarStats*.png'):
                 root, ext = os.path.splitext(imgName)
                 shutil.copy(os.path.join(webDir, imgName), os.path.join(os.getcwd(), rrdArchDir, root + "_" + str(time.strftime("%Y-%m-%d")) + ext))
                 logging.debug("Copying/renaming file '%s' from '%s' to '%s'", imgName, webDir, rrdArchDir)

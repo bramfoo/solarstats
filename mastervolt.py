@@ -116,6 +116,4 @@ identified with no flag being set.
 0x0200: Starting
 0x0400: Max power
 0x0800: Max current
-
-
 """
