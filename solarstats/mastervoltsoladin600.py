@@ -1,6 +1,6 @@
 import logging  # General logging
 import struct   # Used in the CRC calculation
-from solarutils import SolarUtils
+import solarutils
 
 class MasterVolt:
     def __init__(self):
@@ -12,7 +12,7 @@ class MasterVolt:
         self.mvCmd_resmax   = "\x97"
         self.mvCmd_hisdat   = "\x9A"
 
-        self.su = SolarUtils()
+        self.su = solarutils.SolarUtils()
 
     # Calculates the (single hex byte) CRC of a given hexadecimal
     def calcCRC(self, data):

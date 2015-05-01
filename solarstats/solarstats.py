@@ -1,13 +1,16 @@
 #! /usr/bin/python
-# This script does some basic Modbus communications with the BlackLine Solar 3000
+# This script reads out basic solar panel statistics from inverters.
+# Currently the following inverters are  supported:
+# * BlacklineSolar 3000
+# * Mastervolt Soladin 600
 
 # FIXME: Modularise: main() report()
 
 # Import Python modules
-import argparse, time, datetime, logging  # Command-line arguments; time conversions; general logging
-import os, sys                      # System utils
-import fnmatch                      # File matching
-import subprocess                   # For calling rrd / sqlite db creation
+import argparse, time, datetime, logging    # Command-line arguments; time conversions; general logging
+import os, sys                              # System utils
+import fnmatch                              # File matching
+import subprocess                           # For calling rrd / sqlite db creation
 import shutil, string
 
 # Specific tools

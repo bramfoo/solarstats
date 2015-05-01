@@ -1,6 +1,6 @@
 import logging  # General logging
 import struct   # Used in the CRC calculation
-from solarutils import SolarUtils
+import solarutils
 
 class BlackLineSolar:
     def __init__(self):
@@ -67,7 +67,7 @@ class BlackLineSolar:
                         'Status2'        : 1,
                         }
 
-        self.su = SolarUtils()
+        self.su = solarutils.SolarUtils()
 
     # Calculate the (two hex byte) Modbus CRC. Judiciuously taken from Minimalmodbus [http://minimalmodbus.sourceforge.net/]
     def calculateModbusCrc(self, inputstring):
