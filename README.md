@@ -16,7 +16,7 @@ The doc directory contains a schema for soldering the RJ11 to DB9 connection req
 
 ```
 $ git clone https://github.com/bramfoo/solarstats.git
-$ cd solarstats/
+$ cd solarstats/solarstats/
 $ chmod u+x BLS_MV_Solar_monolithic.py
 $ ./BLS_MV_Solar_monolithic.py
 ```
