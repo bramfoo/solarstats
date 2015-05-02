@@ -9,14 +9,14 @@ class TestSolarUtils(unittest.TestCase):
         self.su = solarutils.SolarUtils()
 
     def test_printhexInt(self):
-        self.assertEqual(self.su.printhex(5), "5")
-        self.assertNotEqual(self.su.printhex(6), "5")
-        self.assertEqual(self.su.printhex(10), "A")
-        self.assertNotEqual(self.su.printhex(11), "C")
+        self.assertEqual(self.su.printhex(5), "05")
+        self.assertNotEqual(self.su.printhex(6), "05")
+        self.assertEqual(self.su.printhex(10), "0A")
+        self.assertNotEqual(self.su.printhex(11), "0C")
 
     def test_printhexUnicode(self):
         self.assertEqual(self.su.printhex(u'5'), "5")
-        self.assertNotEqual(self.su.printhex(u'6'), "5")
+        self.assertNotEqual(self.su.printhex(u'6'), "05")
 
     def test_printhexStringList(self):
         self.assertEqual(self.su.printhex(["A", "5"]), "41 35")

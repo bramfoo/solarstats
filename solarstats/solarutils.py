@@ -8,16 +8,22 @@ class SolarUtils:
         pass
 
     # Print a string as uppercase hex characters, without leading '0x'
-    # FIXME
+    # Uses https://docs.python.org/2/library/functions.html#format
     def printhex(self, hexVar):
         if type(hexVar) is int:
-            return str(hex(hexVar)[2:]).upper()
+            return format(hexVar, '02X')
+        if type(hexVar) is str:
+            #return ' '.join(format(int(c, 16), '02X') for c in hexVar)   # Fails on long strings
+            return ' '.join(format(ord(c), '02X') for c in hexVar)
+            #return ' '.join(x.encode('hex') for x in hexVar).upper()  # Original
         if type(hexVar) is unicode:
+            #return format(int(hexVar.decode('utf_8'), 16), '02X')
             return str(hexVar.decode()).upper()
-        if type(hexVar) not in [list, str]:
-            raise TypeError("Cannot create hex from type: %s ", str(type(hexVar)))
-
-        return ' '.join(x.encode('hex') for x in hexVar).upper()
+        if type(hexVar) is list:
+            return " ".join([self.printhex(c) for c in hexVar])
+        
+        # Fail for all other types
+        raise TypeError("Cannot create hex from type: %s ", str(type(hexVar)))
 
     def hexify(self, data):
         words = data.split()
