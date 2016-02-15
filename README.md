@@ -21,6 +21,12 @@ $ chmod u+x BLS_MV_Solar_monolithic.py
 $ ./BLS_MV_Solar_monolithic.py
 ```
 
+To run the [unit tests](https://docs.python.org/2/library/unittest.html), from the base project directory run:
+```
+python -m unittest discover
+```
+Optionally add the parameter '-v' to increase the verbosity.
+
 ## To Do
 The current working version (``BLS_MV_Solar_monolithic.py``) is a monolithic, hacked-together version. It works, assuming you have the right setup: a sqlite database, two RRD files, two USB interfaces  (at /dev/ttyUSB0 and /dev/ttyUSB1) connected to the right inverters, the same hardcoded defaults, etc. In other words, not very useful for anyone else...
 
@@ -28,12 +34,12 @@ A more modular version is currently in progress, which aims to be more configura
 
 The roadmap is as follows:
 
+* Add unit tests (in progress)
+* Base converters on abstract base class
 * Create python project structure
 * Create configuration file (removing hardcoded defaults)
-* Import converter classes
 * Use python RRD library
 * More robust HTML generation
-* Add unit tests
 
 ## Links
 

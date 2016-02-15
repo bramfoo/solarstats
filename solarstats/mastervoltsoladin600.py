@@ -1,18 +1,35 @@
 import logging  # General logging
 import struct   # Used in the CRC calculation
 import solarutils
+from baseinverter import BaseInverter
 
-class MasterVolt:
+class MasterVolt(BaseInverter):
+    # Basic Mastervolt commands; class variables
+    mvCmd_probe    = "\xC1"
+    mvCmd_firmware = "\xB4"
+    mvCmd_stats    = "\xB6"
+    mvCmd_maxpow   = "\xB9"
+    mvCmd_resmax   = "\x97"
+    mvCmd_hisdat   = "\x9A"
+
+    su = solarutils.SolarUtils()
+
     def __init__(self):
-        # Basic Mastervolt commands
-        self.mvCmd_probe    = "\xC1"
-        self.mvCmd_firmware = "\xB4"
-        self.mvCmd_stats    = "\xB6"
-        self.mvCmd_maxpow   = "\xB9"
-        self.mvCmd_resmax   = "\x97"
-        self.mvCmd_hisdat   = "\x9A"
+        pass
 
-        self.su = solarutils.SolarUtils()
+# Abstract method implementation
+    @staticmethod
+    def queryBusAddress(serialPort):
+        #FIXME
+        pass;
+
+    def queryInverterInfo(self):
+        #FIXME
+        pass;
+
+    def getSolarData(self):
+        #FIXME
+        pass;
 
     # Calculates the (single hex byte) CRC of a given hexadecimal
     def calcCRC(self, data):
@@ -85,6 +102,12 @@ class MasterVolt:
     # FIXME: Provide a response for this command
     def modelSWCommand(self, slaveAddress):
         pass
+
+    # Inverter data ("02 04 00 0A 00 1F 91 F3")
+    def inverterData(self, slaveAddress):
+        sourceAddress = "00 00"
+        return self.generateCommand(slaveAddress, sourceAddress, self.mvCmd_stats)
+
 
 """
 ===
