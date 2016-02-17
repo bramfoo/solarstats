@@ -22,7 +22,9 @@ class BlackLineSolar(BaseInverter):
         slaveAddress = "FF"
 
         #FIXME
-        return -1;
+        serPort = BlackLineSolar.su.openSerial(serialPort)
+        ch = serPort.read()
+        return ch;
 
     def queryInverterInfo(self):
         #FIXME

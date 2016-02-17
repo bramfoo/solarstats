@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 import unittest
+import mock
 from solarstats import solarutils
 from solarstats.blacklinesolar3000 import blacklinesolar3000
 
@@ -11,8 +12,10 @@ class TestBlacklinesolar(unittest.TestCase):
         self.bls = blacklinesolar3000.BlackLineSolar("port", "FF")
         self.bls2 = blacklinesolar3000.BlackLineSolar("port", "02")
 
-    def test_queryBusAddress(self):
-        self.assertEqual(blacklinesolar3000.BlackLineSolar.queryBusAddress("port"), -1)
+    @mock.patch('solarstats.solarutils.serial.Serial')
+    def test_queryBusAddress(self, mock_serial):
+        mock_serial.return_value.read.return_value = '\xFF'
+        self.assertEqual(blacklinesolar3000.BlackLineSolar.queryBusAddress('/dev/ttyUSB0'), '\xFF')
 
     @unittest.skip("Method not implemented yet")
     def test_queryInverterInfo(self):
@@ -21,7 +24,6 @@ class TestBlacklinesolar(unittest.TestCase):
     @unittest.skip("Method not implemented yet")
     def test_getSolarData(self):
         self.assertEqual(self.bls.getSolarData(""))
-
 
 ### Private methods. Should probably not be tested
     def test_calculateModBusCRC(self):

@@ -1,7 +1,7 @@
 import binascii # Provides unhexlify
 import logging  # General logging
 import math     # Math utils (pow)
-
+import serial   # Serial port
 
 class SolarUtils:
     def __init__(self):
@@ -21,7 +21,7 @@ class SolarUtils:
             return str(hexVar.decode()).upper()
         if type(hexVar) is list:
             return " ".join([self.printhex(c) for c in hexVar])
-        
+
         # Fail for all other types
         raise TypeError("Cannot create hex from type: %s ", str(type(hexVar)))
 
@@ -49,3 +49,22 @@ class SolarUtils:
         return result
         #return int(inp, 16)
         # For \xFF encoded strings: ord('\xFF')
+
+    # Connection details for the serial port; opens the port immediately
+    # http://tubifex.nl/2013/04/read-mastervolt-soladin-600-with-python-pyserial/
+    def openSerial(self, portID):
+        try:
+            serPort = serial.Serial(
+                port=portID,
+                baudrate=9600,
+                timeout=0.5,  # Increase this if timing is too low to get a response
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                bytesize=serial.EIGHTBITS
+            )
+        except (ValueError, serial.SerialException) as inst:
+            logging.error('Error opening serial port: %s', inst.args[0])
+            return None
+
+        logging.info("Using serial port %s", str(serPort))
+        return serPort

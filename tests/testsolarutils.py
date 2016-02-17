@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 import unittest
+import mock
 from solarstats import solarutils
 
 class TestSolarUtils(unittest.TestCase):
@@ -51,3 +52,8 @@ class TestSolarUtils(unittest.TestCase):
         self.assertEqual(self.su.hex2int(['\xFF']), 255)
         self.assertEqual(self.su.hex2int(['\x12', '\x34']), 13330)
         self.assertEqual(self.su.hex2int(['\xAA', '\xAA']), 43690)
+
+    @mock.patch('serial.Serial')
+    def test_openserial(self, mock_serial):
+        self.su.openSerial('/dev/ttyUSB0')
+        mock_serial.assert_called_once_with(baudrate=9600, bytesize=8, parity='N', port='/dev/ttyUSB0', stopbits=1, timeout=0.5)
