@@ -27,8 +27,10 @@ class BlackLineSolar(BaseInverter):
         return ch;
 
     def queryInverterInfo(self):
-        #FIXME
-        pass;
+        serPort = self.su.openSerial(self.port)
+        serPort.write('busQuery')
+        data = self.su.receiveCommand(serPort)
+        return data;
 
     def getSolarData(self):
         #FIXME

@@ -68,3 +68,18 @@ class SolarUtils:
 
         logging.info("Using serial port %s", str(serPort))
         return serPort
+
+    # Read characters from a given port until no more are received
+    def receiveCommand(self, port):
+        data = []
+        ch = port.read()
+        while len(ch) != 0:
+            data.append(ch)
+            ch = port.read()
+
+        if len(data) > 0:
+            logging.info("Received: %s [len = %d]", self.printhex(data), len(data))
+        else:
+            logging.warning("Serial port command requested, but none received")
+
+        return data

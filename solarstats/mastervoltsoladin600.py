@@ -4,7 +4,7 @@ import solarutils
 from baseinverter import BaseInverter
 
 class MasterVolt(BaseInverter):
-    # Basic Mastervolt commands; class variables
+    # Basic Mastervolt commands (class variables)
     mvCmd_probe    = "\xC1"
     mvCmd_firmware = "\xB4"
     mvCmd_stats    = "\xB6"

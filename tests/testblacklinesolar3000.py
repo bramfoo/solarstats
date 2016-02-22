@@ -17,9 +17,10 @@ class TestBlacklinesolar(unittest.TestCase):
         mock_serial.return_value.read.return_value = '\xFF'
         self.assertEqual(blacklinesolar3000.BlackLineSolar.queryBusAddress('/dev/ttyUSB0'), '\xFF')
 
-    @unittest.skip("Method not implemented yet")
-    def test_queryInverterInfo(self):
-        self.assertEqual(self.bls.queryInverterInfo(""))
+    @mock.patch.object(solarutils.SolarUtils, 'openSerial')
+    def test_queryInverterInfo(self, mock_openSerial):
+        mock_openSerial.return_value=self.mockSerial()
+        self.assertEqual(self.bls.queryInverterInfo(), '\xFF')
 
     @unittest.skip("Method not implemented yet")
     def test_getSolarData(self):
@@ -70,3 +71,21 @@ class TestBlacklinesolar(unittest.TestCase):
 
     def test_modelSWCommand(self):
         self.assertEqual(self.bls2.modelSWCommand(), "\x02\x04\x00\x2B\x00\x02\x01\xF0")
+
+
+    # Mock serial object. Supports the read/write methods
+    class mockSerial(object):
+        # instance properties
+        _responses = { 'busQuery' : ['\xFF', '\x03', '\x00', '\x3C', '\x00', '\x01', '\x51', '\xD8']}
+
+        def __init__(self):
+            response = []
+
+        def read(self):
+            if (len(self.response)):
+                return self.response.pop(0)
+            else:
+                return ''
+
+        def write(self, argValue):
+            self.response = self._responses[argValue]
