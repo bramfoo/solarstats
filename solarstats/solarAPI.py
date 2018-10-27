@@ -48,10 +48,10 @@ def lastday(inverterID=None):
         if inverterID is None:
             response = database.inverterInfo()
         else:
-            fromDate = request.args.get('from', default = None, type = int)
+            fromDate = request.args.get('from', default = None, type = str)
             toDate = request.args.get('to', default = None, type = str)
-            response = database.reading(str(inverterID))
-        logging.debug(response)
+            response = database.reading(inverterID, fromDate, toDate)
+        # logging.debug(response)
         return jsonify(response)
     else:
         return ('', 204)

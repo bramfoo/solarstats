@@ -28,26 +28,31 @@ class SolarDB:
         return latestReading
 
     def getDistinctIDs(self):
+        # Return as list instead of tuple (see https://stackoverflow.com/a/23115247)
+        conn.row_factory = lambda cursor, row: row[0]
         cursor = conn.cursor()
-        # Get unique IDs
         cursor.execute('SELECT DISTINCT id FROM inverter')
         ids = cursor.fetchall()
         logging.debug("Dinstict IDs found: %s", ids)
+        # Reset row_factory to return full row
+        conn.row_factory = None
         cursor.close()
         return ids
 
     def inverterInfo(self):
+        conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        ids = self.getDistinctIDs()
-        inverters = {}
-        for id in ids:
-            cursor.execute(
-                'SELECT Manufacturer, Model FROM invertertype where ID=?', id)
-            reading = cursor.fetchone()
-            logging.debug("Inverter info: %s", reading)
-            inverters[id[0]] = {
-                'Manufacturer': reading[0], 'Model': reading[1]}
+        cursor.execute(
+                'SELECT ID, Manufacturer, Model FROM invertertype')
+        results = cursor.fetchmany(100)
         cursor.close()
+        conn.row_factory = None
+
+        logging.debug("Found %s row(s) of inverter data", len(results))        
+        inverters = {}
+        for row in results:
+            inverters[row['ID']] = {
+                'Manufacturer': row['Manufacturer'], 'Model': row['Model']}
         return inverters
 
     def getManufacturerByID(self, inverterID):
@@ -59,25 +64,56 @@ class SolarDB:
         cursor.close()
         return manufacturer
 
-    def reading(self, inverterID):
-        latest = self.latestReading(inverterID)
-        if (latest is None):
+    def reading(self, inverterID, fromDate=None, toDate=None):
+        # Check if ID exists
+        if (inverterID not in self.getDistinctIDs()):
             logging.warn("No reading for %s", inverterID)
             return {'Error':'No reading for inverterID {}'.format(inverterID)}
-        cursor = conn.cursor()
-        cursor.execute(
-            'SELECT PowerAC, VoltsPV1, CurrentPV1, EnergyToday, EnergyTotal, MinToday, HrsTotal, Temperature FROM inverterdata WHERE Inverter_ID=? AND DateTime=?', (inverterID, latest))
-        query = cursor.fetchone()
-        cursor.close()
-        results = {}
-        electric = {'Power': query[0],
-                    'Voltage': query[1], 'Current': query[2]}
-        energy = {'Today': query[3], 'Total': query[4]}
-        time = {'MinToday': query[5], 'TotalHours': query[6]}
 
-        results[latest] = {
-            'Electric': electric, 'Energy': energy, 'Time': time, 'Temperature': query[7]}
-        return results
+        query = 'SELECT DateTime, PowerAC, VoltsPV1, CurrentPV1, EnergyToday, EnergyTotal, MinToday, HrsTotal, Temperature FROM inverterdata WHERE Inverter_ID=?'
+        params = (inverterID, )
+
+        if (fromDate is None) and (toDate is None):
+            # Return latest value
+            queryDate = self.latestReading(inverterID)
+            query = query + ' AND DateTime=?'
+            params = params + (queryDate,)
+        elif (fromDate is not None):
+            start = datetime.datetime.strptime(fromDate.replace('"', ''), '%Y-%m-%d %H:%M:%S')
+            logging.debug("Time: %s", start)
+            query = query + ' AND DateTime>=?'
+            params = params + ('{}'.format(start), )
+        if (toDate is not None):
+            end = datetime.datetime.strptime(toDate.replace('"', ''), '%Y-%m-%d %H:%M:%S')
+            query = query + ' AND DateTime<=?'
+            params = params + ('{}'.format(end), )
+        
+        logging.debug("Query: %s; parameters: %s", query, params)
+
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute(query, params)
+        results = cursor.fetchmany(100)
+        cursor.close()
+        conn.row_factory = None
+
+        resultsMap = {}
+        if not results:
+            logging.warn("No results found for inverterID %s from %s to %s", inverterID, fromDate, toDate)
+            return resultsMap
+
+        # Loop over all rows
+        for row in results:
+            electric = {'Power': row['PowerAC'],
+                        'Voltage': row['VoltsPV1'], 'Current': row['CurrentPV1']}
+            energy = {'Today': row['EnergyToday'], 'Total': row['EnergyTotal']}
+            time = {'MinToday': row['MinToday'], 'TotalHours': row['HrsTotal']}
+
+            resultsMap[row['DateTime']] = {
+                'Electric': electric, 'Energy': energy, 'Time': time, 'Temperature': row['Temperature']}
+        logging.debug("Found %s rows", len(resultsMap))
+        
+        return resultsMap
 
     def latestSomething(self):
         # Retrieve slave address from db
