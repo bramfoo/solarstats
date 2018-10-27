@@ -44,7 +44,7 @@ class SolarDB:
         cursor = conn.cursor()
         cursor.execute(
                 'SELECT ID, Manufacturer, Model FROM invertertype')
-        results = cursor.fetchmany(100)
+        results = cursor.fetchmany(1000)
         cursor.close()
         conn.row_factory = None
 
@@ -93,7 +93,7 @@ class SolarDB:
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         cursor.execute(query, params)
-        results = cursor.fetchmany(100)
+        results = cursor.fetchmany(1000)
         cursor.close()
         conn.row_factory = None
 
