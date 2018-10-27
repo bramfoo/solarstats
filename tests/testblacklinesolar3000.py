@@ -12,15 +12,17 @@ class TestBlacklinesolar(unittest.TestCase):
         self.bls = blacklinesolar3000.BlackLineSolar("port", "FF")
         self.bls2 = blacklinesolar3000.BlackLineSolar("port", "02")
 
-    @mock.patch('solarstats.solarutils.serial.Serial')
-    def test_queryBusAddress(self, mock_serial):
-        mock_serial.return_value.read.return_value = '\xFF'
+    @mock.patch.object(solarutils.SolarUtils, 'openSerial')
+    def test_queryBusAddress(self, mock_openSerial):
+        mock_openSerial.return_value=self.mockSerial()
         self.assertEqual(blacklinesolar3000.BlackLineSolar.queryBusAddress('/dev/ttyUSB0'), '\xFF')
+        mock_openSerial.assert_called_once_with('/dev/ttyUSB0')
 
     @mock.patch.object(solarutils.SolarUtils, 'openSerial')
     def test_queryInverterInfo(self, mock_openSerial):
         mock_openSerial.return_value=self.mockSerial()
         self.assertEqual(self.bls.queryInverterInfo(), '\xFF')
+        mock_openSerial.assert_called_once_with('FF')
 
     @unittest.skip("Method not implemented yet")
     def test_getSolarData(self):
