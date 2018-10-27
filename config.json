@@ -1,0 +1,9 @@
+{
+  "API": {
+    "version": "0.1"
+  },
+  "database": {
+    "filename": "db/SolarElz673.sqlt",
+    "logfile": "SolarStatsDB.log"
+  }
+}
