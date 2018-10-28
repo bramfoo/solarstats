@@ -12,11 +12,11 @@ class SolarUtils:
     def printhex(self, hexVar):
         if type(hexVar) is int:
             return format(hexVar, '02X')
-        if type(hexVar) is str:
+        if type(hexVar) is bytes:
             #return ' '.join(format(int(c, 16), '02X') for c in hexVar)   # Fails on long strings
             return ' '.join(format(ord(c), '02X') for c in hexVar)
             #return ' '.join(x.encode('hex') for x in hexVar).upper()  # Original
-        if type(hexVar) is unicode:
+        if type(hexVar) is str:
             #return format(int(hexVar.decode('utf_8'), 16), '02X')
             return str(hexVar.decode()).upper()
         if type(hexVar) is list:
